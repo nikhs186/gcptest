@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "lisi-lease",
+  "private_key_id": "f2438539e934f8351a2a053281c2cebf9cdfbba1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC83SFOg8RIAHlP\nwe0f6U1IsESjOZ9CsM2NmrpO2AjqZizqw2fbw7MmLqpPP2Y8c3NHT78BEiI+l66f\njS+e9HElgYmRINCKUvF1+2Ymv/6LgyexLQc0eYKr93Rg3qVsTSOlQgYXQkHrd3CO\nmiPxAuNnpjg/6BdeO5TtpsE232xzHQdizecpWMnOISn67ahA3QhPnigdFYbnTfnl\nKgWaHzVEUJavSJ8iGP2adYfxFDifE2+dG3/UaXuBWmAy3vfTRippW6Btl2/w99Wz\nDC+T/UnjbQWmpW2OAfNtQW1mspsX/epcWGe1HXyAVSIyV+wQ6YpzXAtHK9tzRfzz\nT3+m3CWrAgMBAAECggEABa5eS4G3FUubPiM6EjJkWCPpQRfr6seYLYnkQdE7ehdY\n2KiPVPL2BzsPIFbORYsiZd+WLMlZW1vftJODt0Hakh/dPgChMbqrU/rU7DKz92zv\n18buXJutHKXvi8OIjcpkBClsxSVXB7xKpjPvyrpW5y3iVdXK8GGOVM1QuLBW1oZ1\nEMRlD/2DbZyvZ4WzAgpUzjthwkv81wabgEJdEpnS5iWOtqUnKMz4w/XMOa7cwaSu\nVtaWd8jyYwvoSvYNPC8iG9oYJ/3y6Ren5pQ7IiMA/rf0QvEBz19+3viIJ8VVXb8F\neHZH7SXwmmW95/kkHTcz4blxfvRBEDKRufz9PzLoSQKBgQDfsDkPg0R0rQaawB8H\nexw/mzRTgxga+haJYX2aPw9aWZCvw83cYExTmajrKqiB4FK6eu5RWy9XbP1aUy1S\nNIfwagSsrxsQCcXyZjKskjg1AaecozbZpnrwUV7AALeyOtMhHg0lWDShUH/7weMP\nli1OaZu45dvhrJP9anAmfP0r8wKBgQDYJSDWL0sHE2VxJAZ6Mf0Z7Cm19809tcCl\nJUqxxaUvLUOYi8qxIZpdTzI873V2BldhfPxAF88QvSPgqGUOUddUlYeebHAuP7Ld\nx5OxYEYkm+3BWDkWRoPBctZ52U1qmImaxVeYhK2HcyQDgi0J4iA0gFsOAHEyAsQh\nYkxgZ2klaQKBgQCjEhQ3E+o26OC0tjSovn40fJAkBaDwIbuGQbVQWoJ1ym+pQyRz\ncRyToaS8dCfOLtwAqJfOZZxYrtLwI00Z7cPgZ1mrDii7g3R0Jz7wAdTKB7/KeE4H\nU8+yHI/nh15jp3C9ZuwMeoY7x7TVs141wbSbwm/M1n16wtZMW2kRFfN3MwKBgQDA\nXosTFZRY/9JRGBcLumHhKGcXJSztt011rfMEtTuG+Won4oLLk3Snh0zXHugT2yD6\nCxsWkBoic7PyxuzqCbzz8wF45loRT3AKIw4318+V1ZGNes+UG7439dUdLWHRdWFC\n9lA31h37Z2auGLWtDixLjdF8bLhSIlQcwjfntSHHwQKBgQDDTUwRojo+kfuT5y6k\nSURiTz7ZFvMaHFYtRyEk2Oc29vZNFvBcLYV/0bUelObkhZn0dDe7/dsfLq1f89IB\ni6o09+eqPYq6ZnnV/t9klx1ooigHYMnQvxwSZLVzoXpDtVosiUC+6aH9PHm+nhhW\nfhv9S1ZmjUTFCPDfPD1MWvTpbw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "github@lisi-lease.iam.gserviceaccount.com",
+  "client_id": "105426192265487024474",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github%40lisi-lease.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+functions/lib/
+
+# Environment variables / secrets
+.env
+.env.*
+service.json
+*serviceAccount*.json
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+ui-debug.log
+
+# Logs
+*.log
+
+# OS
+.DS_Store

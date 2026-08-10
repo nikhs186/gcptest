@@ -32,7 +32,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase
-        run: npx firebase-tools deploy --only functions --token "$FIREBASE_TOKEN" --non-interactive
+      - name: Write service account key
+        run: echo "$FIREBASE_SERVICE_ACCOUNT" | base64 -d > "$RUNNER_TEMP/gcp-key.json"
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Firebase
+        run: npx firebase-tools deploy --only functions --non-interactive
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-key.json

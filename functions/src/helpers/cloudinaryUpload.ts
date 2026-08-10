@@ -41,7 +41,7 @@ export async function uploadToCloudinary(
         width: 1200,
         fetch_format: "auto",
         quality: "auto",
-        crop: "scale"
+        crop: "scale",
       },
     ];
   }

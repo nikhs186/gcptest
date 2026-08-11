@@ -2,7 +2,7 @@
 node_modules/
 
 # Build output
-functions/lib/
+lib/
 
 # Environment variables / secrets
 .env

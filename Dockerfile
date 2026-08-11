@@ -1,4 +1,4 @@
-# Build context is the functions/ directory: docker build -t lisi-api .
+# Build context is the repo root: docker build -t lisi-api .
 FROM node:22-slim AS build
 WORKDIR /app
 

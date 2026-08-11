@@ -1,4 +1,4 @@
-name: Deploy Firebase Functions
+name: Deploy API to Droplet
 
 on:
   push:
@@ -32,12 +32,18 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Write service account key
-        run: echo "$FIREBASE_SERVICE_ACCOUNT" | base64 -d > "$RUNNER_TEMP/gcp-key.json"
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Deploy to Firebase
-        run: npx firebase-tools deploy --only functions --non-interactive
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp-key.json
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/lisi-api
+            git fetch origin main
+            git reset --hard origin/main
+            cd functions
+            npm ci
+            npm run build
+            pm2 reload ecosystem.config.js --update-env

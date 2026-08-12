@@ -36,7 +36,7 @@ jobs:
         run: aws eks update-kubeconfig --name app-cluster --region ap-south-1
 
       - name: Deploy manifests
-        run: kubectl apply -f deployment-aws.yaml
+        run: kubectl apply -f deployment.yaml
 
       - name: Roll out the new image
         run: |

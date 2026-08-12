@@ -1,0 +1,48 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write   # required for keyless Workload Identity Federation auth
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1009507091220/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-deployer@esoteric-fx-422410-a7.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker asia-south1-docker.pkg.dev
+
+      - name: Build and push image
+        run: |
+          docker build -t asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} .
+          docker tag asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
+          docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+          docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
+
+      - name: Get cluster credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: app-cluster
+          location: asia-south1-a
+
+      - name: Deploy manifests
+        run: |
+          kubectl apply -f deployment.yaml
+
+      - name: Roll out the new image
+        run: |
+          kubectl set image deployment/app app=asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+          kubectl rollout status deployment/app

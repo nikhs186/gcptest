@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
+        image: 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:latest
         ports:
         - containerPort: 8080
         resources:

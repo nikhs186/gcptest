@@ -1,4 +1,4 @@
-name: Deploy to GKE
+name: Deploy to EKS
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write   # required for keyless Workload Identity Federation auth
+  id-token: write   # required for keyless OIDC auth to AWS
 
 jobs:
   deploy:
@@ -14,35 +14,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - id: auth
-        uses: google-github-actions/auth@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          workload_identity_provider: projects/1009507091220/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-          service_account: github-deployer@esoteric-fx-422410-a7.iam.gserviceaccount.com
+          role-to-assume: arn:aws:iam::205480710144:role/github-deployer
+          aws-region: ap-south-1
 
-      - uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker auth
-        run: gcloud auth configure-docker asia-south1-docker.pkg.dev
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 | \
+            docker login --username AWS --password-stdin 205480710144.dkr.ecr.ap-south-1.amazonaws.com
 
       - name: Build and push image
         run: |
-          docker build -t asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} .
-          docker tag asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
-          docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
-          docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
+          docker build -t 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }} .
+          docker tag 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }} 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:latest
+          docker push 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }}
+          docker push 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:latest
 
-      - name: Get cluster credentials
-        uses: google-github-actions/get-gke-credentials@v2
-        with:
-          cluster_name: app-cluster
-          location: asia-south1-a
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name app-cluster --region ap-south-1
 
       - name: Deploy manifests
-        run: |
-          kubectl apply -f deployment.yaml
+        run: kubectl apply -f deployment-aws.yaml
 
       - name: Roll out the new image
         run: |
-          kubectl set image deployment/app app=asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+          kubectl set image deployment/app app=205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }}
           kubectl rollout status deployment/app

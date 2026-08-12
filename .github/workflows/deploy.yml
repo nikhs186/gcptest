@@ -1,4 +1,4 @@
-name: Deploy to GCP
+name: Deploy to GKE
 
 on:
   push:
@@ -28,23 +28,21 @@ jobs:
       - name: Build and push image
         run: |
           docker build -t asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} .
+          docker tag asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }} asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
           docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+          docker push asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:latest
 
-      - name: Create new instance template
-        run: |
-          gcloud compute instance-templates create-with-container instance-template-global-${{ github.sha }} \
-            --source-instance-template=instance-template-global \
-            --container-image=asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+      - name: Get cluster credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: app-cluster
+          location: asia-south1-a
 
-      - name: Roll out to MIG
+      - name: Deploy manifests
         run: |
-          gcloud compute instance-groups managed rolling-action start-update instance-group-1 \
-            --version=template=instance-template-global-${{ github.sha }} \
-            --region=asia-south1 \
-            --max-surge=1 --max-unavailable=0
+          kubectl apply -f deployment.yaml
 
-      - name: Wait for rollout to finish
+      - name: Roll out the new image
         run: |
-          gcloud compute instance-groups managed wait-until instance-group-1 \
-            --version-target-reached \
-            --region=asia-south1
+          kubectl set image deployment/app app=asia-south1-docker.pkg.dev/esoteric-fx-422410-a7/gcp-test/app:${{ github.sha }}
+          kubectl rollout status deployment/app

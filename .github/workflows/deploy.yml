@@ -1,12 +1,17 @@
-name: Deploy to EKS
+name: Deploy to Cloud Run
 
 on:
   push:
     branches: [main]
 
+env:
+  PROJECT_ID: lisi-lease-staging-f86ca
+  REGION: asia-south1
+  SERVICE: lisi-api
+  REPOSITORY: lisi-api   # Artifact Registry Docker repo
+
 permissions:
   contents: read
-  id-token: write   # required for keyless OIDC auth to AWS
 
 jobs:
   deploy:
@@ -14,31 +19,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
         with:
-          role-to-assume: arn:aws:iam::205480710144:role/github-deployer
-          aws-region: ap-south-1
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region ap-south-1 | \
-            docker login --username AWS --password-stdin 205480710144.dkr.ecr.ap-south-1.amazonaws.com
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 
       - name: Build and push image
         run: |
-          docker build -t 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }} .
-          docker tag 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }} 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:latest
-          docker push 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }}
-          docker push 205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:latest
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" .
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
 
-      - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name app-cluster --region ap-south-1
-
-      - name: Deploy manifests
-        run: kubectl apply -f deployment.yaml
-
-      - name: Roll out the new image
+      - name: Deploy to Cloud Run
         run: |
-          kubectl set image deployment/app app=205480710144.dkr.ecr.ap-south-1.amazonaws.com/gcp-test:${{ github.sha }}
-          kubectl rollout status deployment/app
+          gcloud run deploy "$SERVICE" \
+            --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:${{ github.sha }}" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --platform managed \
+            --port 8080 \
+            --cpu 4 \
+            --memory 8Gi \
+            --min-instances 2 \
+            --max-instances 50 \
+            --allow-unauthenticated

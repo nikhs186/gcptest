@@ -1,57 +1,18 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: app
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: app
-  template:
-    metadata:
-      labels:
-        app: app
-    spec:
-      containers:
-      - name: app
-        image: registry.digitalocean.com/lisi-api/lisi-api:latest
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: "4"
-            memory: 8Gi
-          limits:
-            cpu: "8"
-            memory: 16Gi
----
 apiVersion: v1
-kind: Service
-metadata:
-  name: app-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: app
-  ports:
-  - port: 80
-    targetPort: 8080
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: app-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: app
-  minReplicas: 1
-  maxReplicas: 100
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 60
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKekNDQWcrZ0F3SUJBZ0lDQm5Vd0RRWUpLb1pJaHZjTkFRRUxCUUF3TXpFVk1CTUdBMVVFQ2hNTVJHbG4KYVhSaGJFOWpaV0Z1TVJvd0dBWURWUVFERXhGck9ITmhZWE1nUTJ4MWMzUmxjaUJEUVRBZUZ3MHlOakE0TVRjdwpPREE0TXpsYUZ3MDBOakE0TVRjd09EQTRNemxhTURNeEZUQVRCZ05WQkFvVERFUnBaMmwwWVd4UFkyVmhiakVhCk1CZ0dBMVVFQXhNUmF6aHpZV0Z6SUVOc2RYTjBaWElnUTBFd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUIKRHdBd2dnRUtBb0lCQVFEMG1HVUJNaTk0NUZndlJiVmNJTHhRck5kd21TakxUb0NkTWdjNERDWXZpWjBsV283YwpSYytDUTdNS29jMnJkZFBZTXNad0FkQ0xtWTUwaTZ1NHV2UHArRE1oM0xTT0R0cE0yS2hpODRBY1NGVFRiTUUrCklQWE52T3M5MEVhUXBoNWZ4cFpBcHc1TkpyUnNhd2dOL0w1Mit3dWVSTHRBSDFya013Wlh1K001VklHc1pmMEYKRVcwSUdlU1RMWEoyUC8rS2FzazBMdkF4UjB4aEpUZmtFVzVBc1lZMXBYc3AwdkFDS1pIVVJpZTdYZ2k1WUlzNQorUHlNd0JnNCtndmxsdDYva2lSZW9pN0FNMGdSM2lvcDNEWnRQV3BtNDdqalJFc2czeWJ4aWlWZEplZXNBT0hYCkR1S1hmWE8zYkROMnhVWE91cVVOQm96NE9MWlUvVUVmMGFxNUFnTUJBQUdqUlRCRE1BNEdBMVVkRHdFQi93UUUKQXdJQmhqQVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUFNQjBHQTFVZERnUVdCQlN6OERFcFhkWGdXNGMyME8xNApha1JVUnVDL0VqQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFYZUpxUUZFYVM3SkY3NXRQSElwT1hhajZrS09kCkMzTGtIWlF5U0RWTjE5bUVRVEsrTjhSaVl4RnR1U01nQlo3R1l6S3RiL2tScjhaNnRtbnV0ZWc0VldHeVZvbG8KVk04ckVnOHp3Rk0zUnVZeHdBRlRBT25pQ1VZU1NVTDB4M00xZUlEVmdCamtOWnA1M2hDeDBIWVoyRklhOElVQQpkeFQwUUMzU2JpenhqYW5QTTE1NkxpWS8rcG91V2V2VjZ4SGNZNEVRakRwMzVFYkFGWWd0ME9lS29Oblk4WUIwCm04bjRZS3lpQlZ0UDV4eXN3U1ZJNlFJelYvcWp6R1ZLblB1WjV5bklYeUJZTnFyem1neCtDL0IzTFo2ZnRMNWYKM2M4dEJ1aW1ybWhDaUw3VmxDQTcrL2V3M1BRZjl1UXFFUVIrZ1plMUJsQ1hTbUtWVHFWVGpmZGhPUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://4aa9cadf-2510-4efc-8667-96bf7c92e0f4.k8s.ondigitalocean.com
+  name: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475
+contexts:
+- context:
+    cluster: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475
+    user: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475-admin
+  name: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475
+current-context: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475
+kind: Config
+preferences: {}
+users:
+- name: do-blr1-k8s-1-36-3-do-1-blr1-1786954033475-admin
+  user:
+    token: dop_v1_46a72269f69ea50273fa4f5dea615e797611c0f1860f5c6f01cfe60cfb5c7499

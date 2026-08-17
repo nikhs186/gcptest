@@ -1,14 +1,14 @@
-name: Deploy to Cloud Run
+name: Deploy to DOKS
 
 on:
   push:
     branches: [main]
 
 env:
-  PROJECT_ID: lisi-lease-staging-f86ca
-  REGION: asia-south1
-  SERVICE: lisi-api
-  REPOSITORY: lisi-api   # Artifact Registry Docker repo
+  REGISTRY: registry.digitalocean.com
+  REGISTRY_NAME: lisi-api        # DigitalOcean Container Registry name
+  IMAGE: lisi-api
+  CLUSTER_ID: 4aa9cadf-2510-4efc-8667-96bf7c92e0f4
 
 permissions:
   contents: read
@@ -19,34 +19,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
 
       - name: Build and push image
         run: |
-          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}"
-          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" .
-          docker push "$IMAGE:${{ github.sha }}"
-          docker push "$IMAGE:latest"
+          IMAGE_PATH="${REGISTRY}/${REGISTRY_NAME}/${IMAGE}"
+          docker build -t "$IMAGE_PATH:${{ github.sha }}" -t "$IMAGE_PATH:latest" .
+          docker push "$IMAGE_PATH:${{ github.sha }}"
+          docker push "$IMAGE_PATH:latest"
 
-      - name: Deploy to Cloud Run
+      - name: Save DOKS kubeconfig
+        run: doctl kubernetes cluster kubeconfig save "$CLUSTER_ID"
+
+      - name: Deploy manifests
+        run: kubectl apply -f deployment.yaml
+
+      - name: Roll out the new image
         run: |
-          gcloud run deploy "$SERVICE" \
-            --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:${{ github.sha }}" \
-            --project "$PROJECT_ID" \
-            --region "$REGION" \
-            --platform managed \
-            --port 8080 \
-            --cpu 4 \
-            --memory 8Gi \
-            --min-instances 2 \
-            --max-instances 50 \
-            --allow-unauthenticated
+          kubectl set image deployment/app app="${REGISTRY}/${REGISTRY_NAME}/${IMAGE}:${{ github.sha }}"
+          kubectl rollout status deployment/app

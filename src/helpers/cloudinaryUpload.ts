@@ -101,8 +101,9 @@ export async function uploadBufferToCloudinary(
   optimizeImage?: boolean
 ): Promise<{urls: string[]; public_id: string}> {
   const uploadOptions = buildUploadOptions(maintainRatio, optimizeImage);
+  uploadOptions.folder = "test";
 
-  logger.info("Uploading file buffer to Cloudinary", {size: buffer.length, maintainRatio});
+  logger.info("Uploading file buffer to Cloudinary", {size: buffer.length, maintainRatio, folder: uploadOptions.folder});
 
   const result = await new Promise<UploadApiResponse>((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, uploadResult) => {

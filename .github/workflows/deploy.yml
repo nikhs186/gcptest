@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: registry.digitalocean.com
-  REGISTRY_NAME: lisi-api        # DigitalOcean Container Registry name
+  REGISTRY_NAME: test233         # DigitalOcean Container Registry name
   IMAGE: lisi-api
   CLUSTER_ID: 4aa9cadf-2510-4efc-8667-96bf7c92e0f4
 

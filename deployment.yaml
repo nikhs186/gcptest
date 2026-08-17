@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: registry.digitalocean.com/lisi-api/lisi-api:latest
+        image: registry.digitalocean.com/test233/lisi-api:latest
         ports:
         - containerPort: 8080
 ---

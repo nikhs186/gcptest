@@ -37,9 +37,6 @@ jobs:
       - name: Save DOKS kubeconfig
         run: doctl kubernetes cluster kubeconfig save "$CLUSTER_ID"
 
-      - name: Deploy manifests
-        run: kubectl apply -f deployment.yaml
-
       - name: Roll out the new image
         run: |
           kubectl set image deployment/app app="${REGISTRY}/${REGISTRY_NAME}/${IMAGE}:${{ github.sha }}"

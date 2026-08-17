@@ -1,11 +1,16 @@
 import {Router, Request, Response} from "express";
+import multer from "multer";
 import * as logger from "../logger";
 import {downloadImagesAsZip} from "../api/../helpers/zip";
 import {processHitMe} from "../helpers/hitme";
-import {uploadToCloudinary} from "../helpers/cloudinaryUpload";
+import {uploadToCloudinary, uploadBufferToCloudinary} from "../helpers/cloudinaryUpload";
 import {storeXanoLogsTask} from "../tasks/xanoLogs";
 
 const router = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {fileSize: 100 * 1024 * 1024}, // 100MB
+});
 
 router.post("/car/images/download", async (req: Request, res: Response) => {
   try {
@@ -100,6 +105,30 @@ router.post("/cloudinary/upload", async (req: Request, res: Response) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     logger.error("Error uploading to Cloudinary", {error: errorMessage});
+    return res.status(500).json({error: "Failed to upload image", message: errorMessage});
+  }
+});
+
+/**
+ * POST /cloudinary/upload/file
+ * Uploads an image to Cloudinary from a direct file upload (multipart/form-data,
+ * field name "file"), instead of fetching it from a source URL.
+ */
+router.post("/cloudinary/upload/file", upload.single("file"), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({error: "file is required"});
+    }
+
+    const maintainRatio = req.body.maintainRatio === "true" || req.body.maintainRatio === true;
+    const optimizeImage = req.body.optimizeImage === "true" || req.body.optimizeImage === true;
+
+    const result = await uploadBufferToCloudinary(req.file.buffer, maintainRatio, optimizeImage);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+    logger.error("Error uploading file to Cloudinary", {error: errorMessage});
     return res.status(500).json({error: "Failed to upload image", message: errorMessage});
   }
 });

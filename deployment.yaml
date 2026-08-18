@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: registry.digitalocean.com/test233/lisi-api:latest
+        image: 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
         ports:
         - containerPort: 8080
         resources:

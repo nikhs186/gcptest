@@ -17,6 +17,13 @@ spec:
         image: registry.digitalocean.com/test233/lisi-api:latest
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: "2"
+            memory: 4Gi
+          limits:
+            cpu: "2"
+            memory: 4Gi
 ---
 apiVersion: v1
 kind: Service

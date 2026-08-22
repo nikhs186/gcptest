@@ -22,8 +22,8 @@ spec:
             cpu: "1"
             memory: 2Gi
           limits:
-            cpu: "1600m"
-            memory: 3500Mi
+            cpu: "1800m"
+            memory: 2900Mi
 ---
 apiVersion: v1
 kind: Service

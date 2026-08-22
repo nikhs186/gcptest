@@ -1,44 +1,44 @@
-name: Deploy to EKS
+# name: Deploy to EKS
 
-on:
-  push:
-    branches: [main]
+# on:
+#   push:
+#     branches: [main]
 
-permissions:
-  contents: read
-  id-token: write   # required for keyless OIDC auth to AWS
+# permissions:
+#   contents: read
+#   id-token: write   # required for keyless OIDC auth to AWS
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::205480710144:role/github-deployer
-          aws-region: eu-west-2
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: arn:aws:iam::205480710144:role/github-deployer
+#           aws-region: eu-west-2
 
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region eu-west-2 | \
-            docker login --username AWS --password-stdin 205480710144.dkr.ecr.eu-west-2.amazonaws.com
+#       - name: Login to ECR
+#         run: |
+#           aws ecr get-login-password --region eu-west-2 | \
+#             docker login --username AWS --password-stdin 205480710144.dkr.ecr.eu-west-2.amazonaws.com
 
-      - name: Build and push image
-        run: |
-          docker build -t 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }} .
-          docker tag 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }} 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
-          docker push 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }}
-          docker push 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
+#       - name: Build and push image
+#         run: |
+#           docker build -t 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }} .
+#           docker tag 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }} 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
+#           docker push 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }}
+#           docker push 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
 
-      - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name app-cluster2 --region eu-west-2
+#       - name: Update kubeconfig
+#         run: aws eks update-kubeconfig --name app-cluster2 --region eu-west-2
 
-      - name: Deploy manifests
-        run: kubectl apply -f deployment.yaml
+#       - name: Deploy manifests
+#         run: kubectl apply -f deployment.yaml
 
-      - name: Roll out the new image
-        run: |
-          kubectl set image deployment/app app=205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }}
-          kubectl rollout status deployment/app
+#       - name: Roll out the new image
+#         run: |
+#           kubectl set image deployment/app app=205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:${{ github.sha }}
+#           kubectl rollout status deployment/app

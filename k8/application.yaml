@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/nikhs186/gcptest.git
     targetRevision: main
-    path: ./k8
+    path: k8
 
   destination:
     server: https://kubernetes.default.svc

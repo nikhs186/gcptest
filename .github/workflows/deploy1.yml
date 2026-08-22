@@ -33,7 +33,7 @@ jobs:
           docker push 205480710144.dkr.ecr.eu-west-2.amazonaws.com/gcp-test:latest
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name app-cluster --region eu-west-2
+        run: aws eks update-kubeconfig --name app-cluster1 --region eu-west-2
 
       - name: Deploy manifests
         run: kubectl apply -f deployment.yaml

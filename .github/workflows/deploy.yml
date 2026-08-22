@@ -1,0 +1,44 @@
+name: Deploy to DOKS
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: registry.digitalocean.com
+  REGISTRY_NAME: test233         # DigitalOcean Container Registry name
+  IMAGE: lisi-api
+  CLUSTER_ID: 055b6c16-3c87-4991-80fd-2c32f9bda84f
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Build and push image
+        run: |
+          IMAGE_PATH="${REGISTRY}/${REGISTRY_NAME}/${IMAGE}"
+          docker build -t "$IMAGE_PATH:${{ github.sha }}" -t "$IMAGE_PATH:latest" .
+          docker push "$IMAGE_PATH:${{ github.sha }}"
+          docker push "$IMAGE_PATH:latest"
+
+      - name: Save DOKS kubeconfig
+        run: doctl kubernetes cluster kubeconfig save "$CLUSTER_ID"
+
+      - name: Deploy manifests
+        run: kubectl apply -f deployment.yaml
+
+      - name: Roll out the new image
+        run: |
+          kubectl set image deployment/app app="${REGISTRY}/${REGISTRY_NAME}/${IMAGE}:${{ github.sha }}"
+          kubectl rollout status deployment/app

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: app
@@ -19,11 +19,11 @@ spec:
         - containerPort: 8080
         resources:
           requests:
-            cpu: "1000m"
+            cpu: "1"
             memory: 2Gi
           limits:
-            cpu: "1000m"
-            memory: 2Gi
+            cpu: "1600m"
+            memory: 3500Mi
 ---
 apiVersion: v1
 kind: Service
@@ -46,8 +46,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: app
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 1
   metrics:
   - type: Resource
     resource:

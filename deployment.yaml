@@ -47,7 +47,7 @@ spec:
     kind: Deployment
     name: app
   minReplicas: 1
-  maxReplicas: 50
+  maxReplicas: 100
   metrics:
   - type: Resource
     resource:

@@ -9,6 +9,8 @@ lib/
 .env.*
 service.json
 *serviceAccount*.json
+kubeconfig*.yaml
+*kubeconfig*.yml
 
 # Firebase
 .firebase/

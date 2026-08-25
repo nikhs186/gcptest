@@ -32,8 +32,16 @@ jobs:
 
       - name: Set up kubeconfig
         run: |
+          if [ -z "$LKE_KUBECONFIG" ]; then
+            echo "::error::LKE_KUBECONFIG secret is not set (or empty) in the repo settings"
+            exit 1
+          fi
           mkdir -p "$HOME/.kube"
           echo "$LKE_KUBECONFIG" | base64 -d > "$HOME/.kube/config"
+          if ! kubectl --kubeconfig "$HOME/.kube/config" cluster-info > /dev/null 2>&1; then
+            echo "::error::Decoded kubeconfig is invalid or cluster is unreachable"
+            exit 1
+          fi
         env:
           LKE_KUBECONFIG: ${{ secrets.LKE_KUBECONFIG }}
 
